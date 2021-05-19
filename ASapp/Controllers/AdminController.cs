@@ -1,4 +1,5 @@
 ﻿using ASapp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -36,6 +37,40 @@ namespace ASapp.Controllers
             );
 
             return new OkObjectResult(new JwtSecurityTokenHandler().WriteToken(Token));
+        }
+
+
+        [Route("[action]")]
+        [HttpGet]
+        [ResponseCache(Duration = 30)]
+        public List<User> Load()
+        {
+            List<User> users = new List<User>();
+            users.Add(new Models.User { Username = "mit", Password = "electric" });
+            users.Add(new Models.User { Username = "change", Password = "pwd" });
+            users.Add(new Models.User { Username = DateTime.UtcNow.ToString(), Password = "pwd" });
+            return users;
+        }
+
+        [Route("[action]")]
+        [HttpGet]
+        [ResponseCache(Duration = 5, VaryByQueryKeys = new[] { "username" })]
+        public User LoadByUsername(string username, int? _times)
+        {
+            List<User> users = new List<User>();
+            if (_times == null)
+            {
+
+                users.Add(new Models.User { Username = "mit", Password = DateTime.UtcNow.ToString() });
+                users.Add(new Models.User { Username = "change", Password = DateTime.UtcNow.ToString() });
+                users.Add(new Models.User { Username = DateTime.UtcNow.ToString(), Password = "pwd" });
+            }
+            else
+            {
+                return new User { Username = "in search of incredible", Password = "AAdWb" };
+            }
+
+            return users.SingleOrDefault(x => x.Username == username);
         }
     }
 }
